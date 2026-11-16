@@ -5,17 +5,20 @@ import {
 	Center,
 	Flex,
 	Heading,
+	Skeleton,
+	Stack,
 	Text,
 	useColorModeValue,
 } from '@chakra-ui/react'
 import { formatDistance } from 'date-fns'
-import React from 'react'
+import React, { FC } from 'react'
 import { useTranslation } from 'react-i18next'
 import ReactStars from 'react-stars'
 import { uz, enUS, tr, ru } from 'date-fns/locale'
 import Cookies from 'js-cookie'
+import { ReviewProps } from './review.props'
 
-const Review = () => {
+const Review: FC<ReviewProps> = ({ reviews, isLoading }) => {
 	const { t } = useTranslation()
 
 	const getLocalLanguage = () => {
@@ -36,28 +39,40 @@ const Review = () => {
 	return (
 		<>
 			<Heading mt={10}>{t('review', { ns: 'courses' })}</Heading>
-			{data.map((item, index) => (
-				<Flex key={index} gap={4} mt={6} borderBottomWidth={'1px'} pb={2}>
-					<Avatar
-						bg={useColorModeValue('gray.200', 'gray.600')}
-						display={{ base: 'none', md: 'block' }}
-						size={'md'}
-					/>
-					<Box>
-						<Flex align={'center'} gap={2} mt={1}>
-							<Text fontWeight={'bold'}>{item.name}</Text>
-							<Text>
-								{formatDistance(new Date('20:20:2023'), new Date(), {
-									locale: getLocalLanguage(),
-								})}{' '}
-								{t('ago', { ns: 'courses' })}
-							</Text>
+			{isLoading ? (
+				<Stack>
+					<Skeleton height='20px' />
+					<Skeleton height='20px' />
+					<Skeleton height='20px' />
+				</Stack>
+			) : (
+				<>
+					{reviews.map((item, index) => (
+						<Flex key={index} gap={4} mt={6} borderBottomWidth={'1px'} pb={2}>
+							<Avatar
+								bg={useColorModeValue('gray.200', 'gray.600')}
+								display={{ base: 'none', md: 'block' }}
+								size={'md'}
+								name={item.author.fullName}
+								src={item.author.avatar}
+							/>
+							<Box>
+								<Flex align={'center'} gap={2} mt={1}>
+									<Text fontWeight={'bold'}>{item.author.fullName}</Text>
+									<Text>
+										{formatDistance(new Date(item.updatedAt), new Date(), {
+											locale: getLocalLanguage(),
+										})}{' '}
+										{t('ago', { ns: 'courses' })}
+									</Text>
+								</Flex>
+								<ReactStars edit={false} value={Number(item.rating)} />
+								<Text mt={2}>{item.summary}</Text>
+							</Box>
 						</Flex>
-						<ReactStars edit={false} value={Number(item.rating)} />
-						<Text mt={2}>{item.summary}</Text>
-					</Box>
-				</Flex>
-			))}
+					))}
+				</>
+			)}
 			<Center mt={5}>
 				{data.length >= 5 && (
 					<Button

@@ -26,3 +26,11 @@ export interface ICourseAuthorType {
 	avatar: string
 	job: string
 }
+
+export interface ReviewType {
+	author: ICourseAuthorType
+	createdAt: Date
+	updatedAt: Date
+	rating: number
+	summary: string
+}
